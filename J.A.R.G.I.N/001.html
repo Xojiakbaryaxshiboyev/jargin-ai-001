@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>J.A.R.G.I.N. AI - To'liq Ma'lumotlar Boshqaruv Tizimi</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-15px); }
+        }
+        
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 20px rgba(139, 92, 246, 0.3); }
+            50% { box-shadow: 0 0 40px rgba(139, 92, 246, 0.6); }
+        }
+        
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .animate-float { animation: float 6s ease-in-out infinite; }
+        .animate-pulse-glow { animation: pulse-glow 3s ease-in-out infinite; }
+        .animate-slide-in { animation: slideIn 0.5s ease-out; }
+        
+        .glass-effect {
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .scrollbar-hide {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        
+        .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 min-h-screen relative overflow-x-hidden">
+    <!-- Animated Background -->
+    <div class="absolute inset-0 overflow-hidden">
+        <div class="absolute -top-40 -right-40 w-80 h-80 bg-purple-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-float"></div>
+        <div class="absolute -bottom-40 -left-40 w-80 h-80 bg-blue-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-float" style="animation-delay: 2s;"></div>
+        <div class="absolute top-1/2 left-1/2 w-80 h-80 bg-indigo-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-float" style="animation-delay: 4s;"></div>
+    </div>
+
+    <div class="relative z-10 container mx-auto px-4 py-8">
+        <!-- Header -->
+        <header class="text-center mb-12">
+            <div class="inline-flex items-center justify-center w-24 h-24 bg-gradient-to-br from-purple-600 to-blue-600 rounded-3xl mb-6 shadow-2xl animate-pulse-glow">
+                <span class="text-3xl font-black text-white">xojiakbar</span>
+            </div>
+            <h1 class="text-6xl font-black bg-gradient-to-r from-purple-400 via-blue-400 to-indigo-400 bg-clip-text text-transparent mb-4">JARGIN AI</h1>
+            <p class="text-xl text-gray-300 mb-6">To'liq Ma'lumotlar Boshqaruv Tizimi</p>
+            <div class="w-32 h-1 bg-gradient-to-r from-purple-500 to-blue-500 mx-auto rounded-full"></div>
+        </header>
+
+        <!-- Stats -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <div class="glass-effect rounded-2xl p-6 text-center card-hover">
+                <div class="text-3xl font-bold text-purple-400" id="totalUsers">0</div>
+                <div class="text-gray-300 text-sm">Jami Foydalanuvchilar</div>
+            </div>
+            <div class="glass-effect rounded-2xl p-6 text-center card-hover">
+                <div class="text-3xl font-bold text-blue-400" id="todayAdded">0</div>
+                <div class="text-gray-300 text-sm">Bugun Qo'shilgan</div>
+            </div>
+            <div class="glass-effect rounded-2xl p-6 text-center card-hover">
+                <div class="text-3xl font-bold text-indigo-400" id="searchResults">0</div>
+                <div class="text-gray-300 text-sm">Qidiruv Natijalari</div>
+            </div>
+            <div class="glass-effect rounded-2xl p-6 text-center card-hover">
+                <div class="text-3xl font-bold text-pink-400" id="avgAge">0</div>
+                <div class="text-gray-300 text-sm">O'rtacha Yosh</div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="grid grid-cols-1 xl:grid-cols-2 gap-8">
+            <!-- Form Section -->
+            <div class="glass-effect rounded-3xl p-8 card-hover">
+                <h2 class="text-2xl font-bold text-white mb-6 flex items-center">
+                    <span class="w-8 h-8 bg-gradient-to-r from-purple-500 to-blue-500 rounded-lg flex items-center justify-center mr-3">
+                        <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                        </svg>
+                    </span>
+                    Ma'lumot Qo'shish / Tahrirlash
+                </h2>
+
+                <form id="userForm" class="space-y-4 max-h-96 overflow-y-auto scrollbar-hide pr-2">
+                    <input type="hidden" id="editingId" value="">
+                    
+                    <!-- Rasm yuklash -->
+                    <div class="text-center mb-6">
+                        <div class="relative inline-block">
+                            <div id="imagePreview" class="w-24 h-24 bg-gradient-to-br from-purple-100/20 to-blue-100/20 rounded-full flex items-center justify-center border-2 border-dashed border-purple-400/50 hover:border-purple-400 transition-all duration-300 cursor-pointer">
+                                <div class="text-center">
+                                    <svg class="w-6 h-6 mx-auto mb-1 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                    </svg>
+                                    <span class="text-purple-400 text-xs">Rasm</span>
+                                </div>
+                            </div>
+                            <input type="file" id="profileImage" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
+                        </div>
+                    </div>
+
+                    <!-- ID va JShShIR -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-2">ID Raqami</label>
+                            <input type="text" id="userId" required class="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-2">JShShIR</label>
+                            <input type="text" id="jshshir" required maxlength="14" class="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all" placeholder="12345678901234">
+                        </div>
+                    </div>
+
+                    <!-- Ism va Familya -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-2">Ism</label>
+                            <input type="text" id="firstName" required class="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-2">Familya</label>
+                            <input type="text" id="lastName" required class="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all">
+                        </div>
+                    </div>
+
+                    <!-- Tug'ilgan kun va Yosh -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-2">Tug'ilgan kuni</label>
+                            <input type="date" id="birthDate" required class="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-2">Yoshi</label>
+                            <input type="text" id="age" readonly class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-gray-400 cursor-not-allowed">
+                        </div>
+                    </div>
+
+                    <!-- Email va Telefon -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-2">Email</label>
+                            <input type="email" id="email" required class="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all" placeholder="example@email.com">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-2">Telefon raqami</label>
+                            <input type="tel" id="phoneNumber" required class="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all" placeholder="+998 90 123 45 67">
+                        </div>
+                    </div>
+
+                    <!-- Ish joyi -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-2">Ish joyi</label>
+                        <input type="text" id="workplace" required class="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all" placeholder="Kompaniya nomi yoki kasbi">
+                    </div>
+
+                    <!-- Viloyat va Shahar -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-2">Viloyat</label>
+                            <select id="region" required class="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all">
+                                <option value="">Viloyatni tanlang</option>
+                                <option value="Toshkent">Toshkent</option>
+                                <option value="Andijon">Andijon</option>
+                                <option value="Buxoro">Buxoro</option>
+                                <option value="Farg'ona">Farg'ona</option>
+                                <option value="Jizzax">Jizzax</option>
+                                <option value="Xorazm">Xorazm</option>
+                                <option value="Namangan">Namangan</option>
+                                <option value="Navoiy">Navoiy</option>
+                                <option value="Qashqadaryo">Qashqadaryo</option>
+                                <option value="Qoraqalpog'iston">Qoraqalpog'iston</option>
+                                <option value="Samarqand">Samarqand</option>
+                                <option value="Sirdaryo">Sirdaryo</option>
+                                <option value="Surxondaryo">Surxondaryo</option>
+                                <option value="Toshkent viloyati">Toshkent viloyati</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-2">Shahar</label>
+                            <input type="text" id="city" required class="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all" placeholder="Shahar nomi">
+                        </div>
+                    </div>
+
+                    <!-- To'liq manzil -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-2">To'liq manzil</label>
+                        <textarea id="address" required class="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all h-20 resize-none" placeholder="Ko'cha, uy raqami va boshqa ma'lumotlar"></textarea>
+                    </div>
+
+                    <!-- Buttons -->
+                    <div class="flex gap-4 pt-4">
+                        <button type="submit" id="submitBtn" class="flex-1 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-bold py-3 px-6 rounded-xl hover:from-purple-700 hover:to-blue-700 transform hover:scale-105 transition-all duration-300 shadow-lg">
+                            ✨ Saqlash
+                        </button>
+                        <button type="button" id="cancelBtn" class="hidden bg-gray-600 text-white font-bold py-3 px-6 rounded-xl hover:bg-gray-700 transition-all duration-300">
+                            ❌ Bekor qilish
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Search and List Section -->
+            <div class="glass-effect rounded-3xl p-8 card-hover">
+                <h2 class="text-2xl font-bold text-white mb-6 flex items-center">
+                    <span class="w-8 h-8 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-lg flex items-center justify-center mr-3">
+                        <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                        </svg>
+                    </span>
+                    Qidiruv va Ro'yxat
+                </h2>
+
+                <!-- Search -->
+                <div class="mb-6">
+                    <input type="text" id="searchInput" placeholder="Ism, email, telefon, ID, JShShIR bo'yicha qidiring..." class="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
+                </div>
+
+                <!-- User List -->
+                <div id="userList" class="space-y-4 max-h-96 overflow-y-auto scrollbar-hide">
+                    <div class="text-center text-gray-400 py-8">
+                        <svg class="w-16 h-16 mx-auto mb-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                        </svg>
+                        <p>Hozircha ma'lumotlar yo'q</p>
+                        <p class="text-sm">Birinchi foydalanuvchini qo'shing</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success Modal -->
+    <div id="successModal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50">
+        <div class="bg-white/10 backdrop-blur-md rounded-3xl p-8 max-w-md mx-4 text-center shadow-2xl border border-white/20 animate-slide-in">
+            <div class="w-20 h-20 bg-gradient-to-br from-green-400 to-emerald-500 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">
+                <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path>
+                </svg>
+            </div>
+            <h3 class="text-2xl font-bold text-white mb-3">✅ Muvaffaqiyatli!</h3>
+            <p class="text-gray-300 mb-6" id="successMessage">Ma'lumot saqlandi</p>
+            <button onclick="closeSuccessModal()" class="bg-gradient-to-r from-purple-600 to-blue-600 text-white px-8 py-3 rounded-2xl hover:from-purple-700 hover:to-blue-700 transition-all duration-300 font-semibold shadow-lg">
+                ✨ Yopish
+            </button>
+        </div>
+    </div>
+
+    <script>
+        let users = JSON.parse(localStorage.getItem('jarginUsers')) || [];
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            displayUsers();
+            updateStats();
+            setupEventListeners();
+        });
+
+        function setupEventListeners() {
+            // Form submission
+            document.getElementById('userForm').addEventListener('submit', handleFormSubmit);
+            
+            // Search
+            document.getElementById('searchInput').addEventListener('input', handleSearch);
+            
+            // Phone formatting
+            document.getElementById('phoneNumber').addEventListener('input', formatPhone);
+            
+            // JShShIR formatting
+            document.getElementById('jshshir').addEventListener('input', formatJshshir);
+            
+            // Age calculation
+            document.getElementById('birthDate').addEventListener('change', calculateAge);
+            
+            // Cancel button
+            document.getElementById('cancelBtn').addEventListener('click', cancelEdit);
+
+            // Image preview
+            document.getElementById('profileImage').addEventListener('change', handleImageUpload);
+        }
+
+        function handleImageUpload(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const preview = document.getElementById('imagePreview');
+                    preview.innerHTML = `<img src="${e.target.result}" alt="Profile" class="w-full h-full object-cover rounded-full">`;
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function calculateAge() {
+            const birthDate = new Date(document.getElementById('birthDate').value);
+            const today = new Date();
+            let age = today.getFullYear() - birthDate.getFullYear();
+            const monthDiff = today.getMonth() - birthDate.getMonth();
+            
+            if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+                age--;
+            }
+            
+            document.getElementById('age').value = age >= 0 ? age + ' yosh' : '';
+        }
+
+        function handleFormSubmit(e) {
+            e.preventDefault();
+            
+            const imageElement = document.querySelector('#imagePreview img');
+            const profileImage = imageElement ? imageElement.src : '';
+            
+            const formData = {
+                id: document.getElementById('userId').value,
+                jshshir: document.getElementById('jshshir').value,
+                firstName: document.getElementById('firstName').value,
+                lastName: document.getElementById('lastName').value,
+                birthDate: document.getElementById('birthDate').value,
+                age: document.getElementById('age').value,
+                email: document.getElementById('email').value,
+                phoneNumber: document.getElementById('phoneNumber').value,
+                workplace: document.getElementById('workplace').value,
+                region: document.getElementById('region').value,
+                city: document.getElementById('city').value,
+                address: document.getElementById('address').value,
+                profileImage: profileImage,
+                createdAt: new Date().toISOString()
+            };
+
+            const editingId = document.getElementById('editingId').value;
+            
+            if (editingId) {
+                // Update existing user
+                const index = users.findIndex(user => user.id === editingId);
+                if (index !== -1) {
+                    users[index] = { ...users[index], ...formData };
+                    showSuccessModal('Ma\'lumot yangilandi!');
+                }
+            } else {
+                // Add new user
+                if (users.some(user => user.id === formData.id)) {
+                    alert('Bu ID allaqachon mavjud!');
+                    return;
+                }
+                if (users.some(user => user.jshshir === formData.jshshir)) {
+                    alert('Bu JShShIR allaqachon mavjud!');
+                    return;
+                }
+                if (users.some(user => user.email === formData.email)) {
+                    alert('Bu email allaqachon mavjud!');
+                    return;
+                }
+                users.push(formData);
+                showSuccessModal('Yangi ma\'lumot qo\'shildi!');
+            }
+
+            localStorage.setItem('jarginUsers', JSON.stringify(users));
+            resetForm();
+            displayUsers();
+            updateStats();
+        }
+
+        function displayUsers(filteredUsers = null) {
+            const userList = document.getElementById('userList');
+            const usersToShow = filteredUsers || users;
+
+            if (usersToShow.length === 0) {
+                userList.innerHTML = `
+                    <div class="text-center text-gray-400 py-8">
+                        <svg class="w-16 h-16 mx-auto mb-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                        </svg>
+                        <p>${filteredUsers ? 'Qidiruv natijalari topilmadi' : 'Hozircha ma\'lumotlar yo\'q'}</p>
+                        <p class="text-sm">${filteredUsers ? 'Boshqa kalit so\'z bilan qidiring' : 'Birinchi foydalanuvchini qo\'shing'}</p>
+                    </div>
+                `;
+                return;
+            }
+
+            userList.innerHTML = usersToShow.map(user => `
+                <div class="bg-white/5 rounded-2xl p-4 border border-white/10 hover:bg-white/10 transition-all duration-300 animate-slide-in">
+                    <div class="flex items-start gap-4 mb-3">
+                        <div class="w-12 h-12 rounded-full overflow-hidden bg-gradient-to-br from-purple-400 to-blue-400 flex-shrink-0">
+                            ${user.profileImage ? 
+                                `<img src="${user.profileImage}" alt="Profile" class="w-full h-full object-cover">` :
+                                `<div class="w-full h-full flex items-center justify-center text-white font-bold">${user.firstName.charAt(0)}</div>`
+                            }
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex justify-between items-start mb-2">
+                                <div>
+                                    <h3 class="text-lg font-bold text-white truncate">${user.firstName} ${user.lastName}</h3>
+                                    <p class="text-sm text-gray-400">${user.age} • ${user.workplace}</p>
+                                </div>
+                                <div class="flex gap-2 flex-shrink-0">
+                                    <button onclick="editUser('${user.id}')" class="bg-blue-600 hover:bg-blue-700 text-white p-2 rounded-lg transition-all">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                        </svg>
+                                    </button>
+                                    <button onclick="deleteUser('${user.id}')" class="bg-red-600 hover:bg-red-700 text-white p-2 rounded-lg transition-all">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-1 gap-1 text-sm">
+                                <div class="flex items-center gap-2">
+                                    <span class="text-gray-400">📧</span>
+                                    <span class="text-white truncate">${user.email}</span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <span class="text-gray-400">📞</span>
+                                    <span class="text-white">${user.phoneNumber}</span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <span class="text-gray-400">🏙️</span>
+                                    <span class="text-white">${user.city}, ${user.region}</span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <span class="text-gray-400">🆔</span>
+                                    <span class="text-white text-xs">${user.id} • ${user.jshshir}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function handleSearch(e) {
+            const query = e.target.value.toLowerCase().trim();
+            
+            if (!query) {
+                displayUsers();
+                document.getElementById('searchResults').textContent = users.length;
+                return;
+            }
+
+            const filtered = users.filter(user => 
+                user.firstName.toLowerCase().includes(query) ||
+                user.lastName.toLowerCase().includes(query) ||
+                user.email.toLowerCase().includes(query) ||
+                user.phoneNumber.includes(query) ||
+                user.id.toLowerCase().includes(query) ||
+                user.jshshir.includes(query) ||
+                user.workplace.toLowerCase().includes(query) ||
+                user.city.toLowerCase().includes(query) ||
+                user.region.toLowerCase().includes(query)
+            );
+
+            displayUsers(filtered);
+            document.getElementById('searchResults').textContent = filtered.length;
+        }
+
+        function editUser(id) {
+            const user = users.find(u => u.id === id);
+            if (!user) return;
+
+            // Fill form with user data
+            document.getElementById('editingId').value = user.id;
+            document.getElementById('userId').value = user.id;
+            document.getElementById('jshshir').value = user.jshshir;
+            document.getElementById('firstName').value = user.firstName;
+            document.getElementById('lastName').value = user.lastName;
+            document.getElementById('birthDate').value = user.birthDate;
+            document.getElementById('age').value = user.age;
+            document.getElementById('email').value = user.email;
+            document.getElementById('phoneNumber').value = user.phoneNumber;
+            document.getElementById('workplace').value = user.workplace;
+            document.getElementById('region').value = user.region;
+            document.getElementById('city').value = user.city;
+            document.getElementById('address').value = user.address;
+
+            // Set profile image
+            if (user.profileImage) {
+                document.getElementById('imagePreview').innerHTML = `<img src="${user.profileImage}" alt="Profile" class="w-full h-full object-cover rounded-full">`;
+            }
+
+            // Update UI
+            document.getElementById('submitBtn').textContent = '✏️ Yangilash';
+            document.getElementById('cancelBtn').classList.remove('hidden');
+            
+            // Scroll to form
+            document.getElementById('userForm').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function cancelEdit() {
+            resetForm();
+        }
+
+        function deleteUser(id) {
+            if (confirm('Bu ma\'lumotni o\'chirishni xohlaysizmi?')) {
+                users = users.filter(user => user.id !== id);
+                localStorage.setItem('jarginUsers', JSON.stringify(users));
+                displayUsers();
+                updateStats();
+                showSuccessModal('Ma\'lumot o\'chirildi!');
+            }
+        }
+
+        function resetForm() {
+            document.getElementById('userForm').reset();
+            document.getElementById('editingId').value = '';
+            document.getElementById('submitBtn').textContent = '✨ Saqlash';
+            document.getElementById('cancelBtn').classList.add('hidden');
+            document.getElementById('imagePreview').innerHTML = `
+                <div class="text-center">
+                    <svg class="w-6 h-6 mx-auto mb-1 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                    </svg>
+                    <span class="text-purple-400 text-xs">Rasm</span>
+                </div>
+            `;
+        }
+
+        function updateStats() {
+            document.getElementById('totalUsers').textContent = users.length;
+            
+            const today = new Date().toDateString();
+            const todayAdded = users.filter(user => 
+                new Date(user.createdAt).toDateString() === today
+            ).length;
+            document.getElementById('todayAdded').textContent = todayAdded;
+            
+            document.getElementById('searchResults').textContent = users.length;
+
+            // Calculate average age
+            if (users.length > 0) {
+                const totalAge = users.reduce((sum, user) => {
+                    const age = parseInt(user.age);
+                    return sum + (isNaN(age) ? 0 : age);
+                }, 0);
+                const avgAge = Math.round(totalAge / users.length);
+                document.getElementById('avgAge').textContent = avgAge;
+            } else {
+                document.getElementById('avgAge').textContent = '0';
+            }
+        }
+
+        function formatPhone(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.startsWith('998')) {
+                value = value.substring(3);
+            }
+            if (value.length > 0) {
+                if (value.length <= 2) {
+                    value = `+998 ${value}`;
+                } else if (value.length <= 5) {
+                    value = `+998 ${value.substring(0, 2)} ${value.substring(2)}`;
+                } else if (value.length <= 7) {
+                    value = `+998 ${value.substring(0, 2)} ${value.substring(2, 5)} ${value.substring(5)}`;
+                } else {
+                    value = `+998 ${value.substring(0, 2)} ${value.substring(2, 5)} ${value.substring(5, 7)} ${value.substring(7, 9)}`;
+                }
+            }
+            e.target.value = value;
+        }
+
+        function formatJshshir(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.length > 14) {
+                value = value.substring(0, 14);
+            }
+            e.target.value = value;
+        }
+
+        function showSuccessModal(message) {
+            document.getElementById('successMessage').textContent = message;
+            document.getElementById('successModal').classList.remove('hidden');
+        }
+
+        function closeSuccessModal() {
+            document.getElementById('successModal').classList.add('hidden');
+        }
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'96f19f8bd4f0d9c3',t:'MTc1NTE4Njc4Ny4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
